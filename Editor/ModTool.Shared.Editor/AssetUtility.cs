@@ -18,13 +18,14 @@ namespace ModTool.Shared.Editor
         /// <returns>The directory where ModTool is located.</returns>
         public static string GetModToolDirectory()
         {
-            string location = typeof(ModInfo).Assembly.Location;
+            var locations = Directory.GetFiles(Application.dataPath, "ModTool.asmdef", SearchOption.AllDirectories);
+            if (!locations.Any())
+                throw new Exception("Can't find ModTool.asmdef!");
+            else if ( locations.Count() > 1)
+                throw new Exception("There should not be multiple ModTool assembly files!" + String.Join(",", locations));
 
-            string modToolDirectory = Path.GetDirectoryName(location);
-
-            if (!Directory.Exists(modToolDirectory))
-                modToolDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
-
+            var modToolPath = locations.First();
+            var modToolDirectory = Path.GetDirectoryName(locations.First());
             return GetRelativePath(modToolDirectory);
         }
 
